@@ -122,6 +122,10 @@ class TestBaseLocation(common.SavepointCase):
             self.partner_obj.create(
                 {"name": "P1", "zip_id": self.barcelona.id, "city_id": False}
             )
+        with self.assertRaises(ValidationError):
+            self.partner_obj.create(
+                {"name": "P1", "zip_id": self.barcelona.id, "zip": False}
+            )
 
     def test_writing_company(self):
         self.company.zip_id = self.barcelona
@@ -185,10 +189,6 @@ class TestBaseLocation(common.SavepointCase):
         self.city_bcn.country_id.enforce_cities = False
         partner.city_id = self.city_bcn
         self.assertFalse(partner.zip_id)
-        partner.city_id = self.env["res.city"]
-        self.assertEqual(
-            len(partner.allowed_zip_ids), self.env["res.city.zip"].search_count([])
-        )
 
     def test_partner_onchange_state(self):
         """Test partner onchange state_id"""
